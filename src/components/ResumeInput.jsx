@@ -2,50 +2,36 @@ import { motion } from 'framer-motion';
 
 export default function ResumeInput({ value, onChange }) {
   const charCount = value.length;
-  const wordCount = value.trim().split(/\s+/).length;
+  const wordCount = value.trim() ? value.trim().split(/\s+/).length : 0;
 
   return (
     <motion.div
-      className="mb-8"
+      className="space-y-3"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <label className="block text-lg font-bold text-slate-100 mb-3">
-        📋 Paste Your Resume
+      <label className="mb-3 block text-sm font-black uppercase tracking-[0.2em] text-[#8a5c9e]">
+        Paste your resume
       </label>
-      <div className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-2xl blur opacity-0 group-hover:opacity-100 transition duration-300" />
-        
-        <textarea
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Paste your full resume here... We'll scan it for ATS compatibility."
-          className="relative w-full h-64 p-6 rounded-2xl focus:outline-none transition resize-none glass-dark text-slate-100 placeholder-slate-400 font-mono text-sm leading-relaxed border border-slate-700/50 hover:border-slate-600/50 focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20"
-        />
-
-        {/* Character count indicator */}
-        <motion.div
-          className="absolute bottom-4 right-4 text-xs font-mono text-slate-300"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-        >
-          <div className="text-right bg-slate-900/60 px-3 py-1 rounded-lg border border-slate-700/30 backdrop-blur-sm">
-            <div className="text-slate-200">{charCount} chars</div>
-            <div className="text-slate-400">{wordCount} words</div>
-          </div>
-        </motion.div>
-      </div>
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder="Ctrl+V the resume. Bullet points, contact info, dates, skills, the tiny evidence crumbs."
+        className="min-h-[220px] w-full resize-y rounded-3xl bg-[#fffaf5]/90 p-6 text-base leading-7 text-[#352a40] shadow-inner shadow-[#e6cbd8]/35 ring-1 ring-[#ead7e4] transition placeholder:text-[#a693a1] focus:outline-none focus:ring-4 focus:ring-[#bca3ff]/35 sm:min-h-[280px]"
+      />
       
-      <motion.p
-        className="text-xs text-slate-400 mt-3 flex items-center gap-2"
+      <motion.div
+        className="flex flex-col gap-2 text-sm leading-6 text-[#766378] sm:flex-row sm:items-center sm:justify-between"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.3 }}
       >
-        💡 <span>Use bullet points, include dates, contact info, and quantified results for better scores!</span>
-      </motion.p>
+        <p className="max-w-2xl">Tiny tip: dates, specific skills, and numbers make the machine less dramatic.</p>
+        <p className="shrink-0 rounded-full bg-white/65 px-3 py-1 text-xs font-bold text-[#7b667d] shadow-sm ring-1 ring-white/70">
+          {charCount.toLocaleString()} chars · {wordCount.toLocaleString()} words
+        </p>
+      </motion.div>
     </motion.div>
   );
 }

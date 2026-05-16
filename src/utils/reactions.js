@@ -1,52 +1,45 @@
 export const recruiterReactions = {
   90: {
-    emoji: '🤩',
-    text: "Recruiter forwarded this to the hiring manager 👀",
-    color: 'bg-gradient-to-r from-emerald-400 to-green-500',
-    textColor: 'text-white',
-    alt: "I'm calling HR right now. You're hired!"
+    text: "The ATS took a victory lap.",
+    subtext: "This resume has main character energy.",
+    color: 'bg-emerald-600',
+    textColor: 'text-white'
   },
   85: {
-    emoji: '😍',
-    text: "Stripe recruiter slightly impressed.",
-    color: 'bg-gradient-to-r from-green-400 to-emerald-500',
-    textColor: 'text-white',
-    alt: "Stellar resume! Interview scheduled ASAP."
+    text: "Resume excellence detected. You're getting a callback.",
+    subtext: "The hiring manager may actually read this.",
+    color: 'bg-emerald-500',
+    textColor: 'text-white'
   },
   80: {
-    emoji: '😊',
-    text: "Actually readable. Rare achievement.",
-    color: 'bg-gradient-to-r from-cyan-400 to-blue-500',
-    textColor: 'text-white',
-    alt: "Nice work! Your resume passed our ATS."
+    text: "The ATS lived. And the recruiter kept scrolling.",
+    subtext: "Strong credentials. Interview potential: high.",
+    color: 'bg-emerald-400',
+    textColor: 'text-white'
   },
   70: {
-    emoji: '🤔',
-    text: "ATS found React and calmed down.",
-    color: 'bg-gradient-to-r from-blue-400 to-indigo-500',
-    textColor: 'text-white',
-    alt: "Not bad. Could be better though."
+    text: "Your resume survived the first pass.",
+    subtext: "But the recruiter attention dropped after page one.",
+    color: 'bg-amber-500',
+    textColor: 'text-white'
   },
   60: {
-    emoji: '😐',
-    text: "Not bad. Recruiter stayed for 12 seconds.",
-    color: 'bg-gradient-to-r from-amber-400 to-orange-500',
-    textColor: 'text-white',
-    alt: "This might survive internship season."
+    text: "The ATS survived, but barely.",
+    subtext: "Keyword alignment is giving group assignment energy.",
+    color: 'bg-amber-600',
+    textColor: 'text-white'
   },
   45: {
-    emoji: '😕',
-    text: "Your bullet point needs therapy.",
-    color: 'bg-gradient-to-r from-orange-400 to-red-500',
-    textColor: 'text-white',
-    alt: "This resume has some issues."
+    text: "This resume needs less mystery and more evidence.",
+    subtext: "Recruiting bots are confused. Very confused.",
+    color: 'bg-orange-600',
+    textColor: 'text-white'
   },
   0: {
-    emoji: '😬',
-    text: "This resume was fighting for its life.",
-    color: 'bg-gradient-to-r from-red-500 to-pink-600',
-    textColor: 'text-white',
-    alt: "Yikes. Major overhaul needed!"
+    text: "The ATS experienced an existential crisis.",
+    subtext: "Start over. Bring formatting. Bring keywords. Bring hope.",
+    color: 'bg-red-600',
+    textColor: 'text-white'
   }
 };
 

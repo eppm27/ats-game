@@ -1,129 +1,122 @@
-import { motion } from 'framer-motion';
+import { animate, motion, useMotionValue, useTransform } from 'framer-motion';
+import { useEffect } from 'react';
 
 export default function ScoreCard({ score }) {
   const getScoreColor = (s) => {
-    if (s >= 80) return { gradient: 'from-emerald-500 via-green-500 to-cyan-600', glow: 'glow-pulse-green', shadow: 'shadow-green-500/50' };
-    if (s >= 60) return { gradient: 'from-amber-500 via-orange-500 to-rose-600', glow: 'glow-pulse-orange', shadow: 'shadow-orange-500/50' };
-    return { gradient: 'from-rose-500 via-red-500 to-pink-600', glow: 'glow-pulse-red', shadow: 'shadow-red-500/50' };
-  };
-
-  const getScoreLabel = (s) => {
-    if (s >= 90) return '🎉 LEGENDARY!';
-    if (s >= 80) return '🌟 Excellent!';
-    if (s >= 70) return '👍 Good';
-    if (s >= 60) return '🤔 Decent';
-    if (s >= 40) return '⚠️ Needs Work';
-    return '❌ Yikes...';
+    if (s >= 80) return { 
+      circle: 'stroke-[#36b37e]',
+      text: 'text-[#16835c]',
+      bg: 'from-[#d8f8e8] to-[#fff9f2]',
+      label: 'Keyword alignment looks suspiciously decent.'
+    };
+    if (s >= 60) return { 
+      circle: 'stroke-[#e79a32]',
+      text: 'text-[#a46516]',
+      bg: 'from-[#ffe6bb] to-[#fff4f6]',
+      label: 'Interview probability: emotionally complicated.'
+    };
+    return { 
+      circle: 'stroke-[#df5f78]',
+      text: 'text-[#b43d59]',
+      bg: 'from-[#ffd5de] to-[#fff4ed]',
+      label: 'This bullet point needs evidence.'
+    };
   };
 
   const colors = getScoreColor(score);
-  const circumference = 2 * Math.PI * 50;
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (latest) => Math.round(latest));
+  const circumference = 2 * Math.PI * 45;
   const strokeDashoffset = circumference - (score / 100) * circumference;
+
+  useEffect(() => {
+    const controls = animate(count, score, { duration: 1.6, ease: 'easeOut' });
+    return controls.stop;
+  }, [count, score]);
 
   return (
     <motion.div
-      initial={{ scale: 0.5, opacity: 0, rotateX: -90 }}
-      animate={{ scale: 1, opacity: 1, rotateX: 0 }}
-      transition={{ duration: 0.8, type: 'spring', stiffness: 60 }}
-      className={`bg-gradient-to-br ${colors.gradient} rounded-3xl p-12 text-white shadow-2xl text-center relative overflow-hidden`}
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.6 }}
+      className={`relative mx-auto w-full max-w-3xl overflow-hidden rounded-[2rem] bg-gradient-to-br ${colors.bg} p-6 shadow-[0_26px_80px_rgba(126,76,142,0.16)] ring-1 ring-white/75 backdrop-blur-xl sm:p-8`}
     >
-      {/* Shimmer effect overlay */}
-      <div className="absolute inset-0 shimmer opacity-20 pointer-events-none" />
-
-      {/* Glow pulse */}
-      <div className={`absolute inset-0 ${colors.glow} opacity-40 pointer-events-none`} />
+      <div className="absolute right-0 top-0 h-28 w-56 -translate-y-1/3 translate-x-1/4 rotate-12 rounded-[40%] bg-white/45 blur-2xl" />
 
       <div className="relative z-10">
-        <motion.p
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.4 }}
-          className="text-xl font-semibold mb-6 opacity-90 uppercase tracking-widest"
+          transition={{ delay: 0.2 }}
+          className="mb-6 text-center"
         >
-          ATS Score
-        </motion.p>
+          <p className="mb-2 text-sm font-black uppercase tracking-[0.22em] text-[#89679e]">
+            ATS Compatibility Score
+          </p>
+          <p className={`mx-auto max-w-md text-base font-bold ${colors.text}`}>
+            {colors.label}
+          </p>
+        </motion.div>
 
-        {/* Animated Circular Progress */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-          className="flex justify-center mb-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
+          className="mb-6 flex justify-center"
         >
-          <div className="relative w-48 h-48">
-            <svg width="200" height="200" className="transform -rotate-90 drop-shadow-lg">
-              {/* Background circle */}
+          <div className="relative w-40 h-40">
+            <svg width="180" height="180" className="transform -rotate-90">
               <circle
-                cx="100"
-                cy="100"
-                r="50"
-                stroke="rgba(255, 255, 255, 0.15)"
-                strokeWidth="10"
+                cx="90"
+                cy="90"
+                r="45"
+                stroke="rgba(126, 76, 142, 0.12)"
+                strokeWidth="8"
                 fill="none"
               />
-              {/* Animated progress circle */}
               <motion.circle
-                cx="100"
-                cy="100"
-                r="50"
-                stroke="rgba(255, 255, 255, 1)"
-                strokeWidth="10"
+                cx="90"
+                cy="90"
+                r="45"
+                stroke="currentColor"
+                strokeWidth="8"
                 fill="none"
                 strokeDasharray={circumference}
                 initial={{ strokeDashoffset: circumference }}
                 animate={{ strokeDashoffset }}
-                transition={{ duration: 2.5, ease: 'easeOut' }}
+                transition={{ duration: 2, ease: 'easeOut' }}
                 strokeLinecap="round"
-                filter="drop-shadow(0 0 10px rgba(255, 255, 255, 0.5))"
+                className={colors.circle}
               />
             </svg>
             
-            {/* Score text in center */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <motion.div
-                initial={{ scale: 0, opacity: 0 }}
+                initial={{ scale: 0.5, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.5, duration: 0.4, type: 'spring' }}
-                className="text-center score-pop"
+                transition={{ delay: 0.4, duration: 0.4 }}
               >
                 <motion.span
                   key={score}
-                  initial={{ opacity: 0, y: 20, scale: 0.5 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  className="text-7xl font-black block leading-none"
-                  style={{ textShadow: '0 0 30px rgba(255, 255, 255, 0.4)' }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`block text-6xl font-black leading-none tracking-[-0.05em] ${colors.text}`}
                 >
-                  {score}
+                  {rounded}
                 </motion.span>
-                <span className="text-3xl font-bold text-white/90">/100</span>
+                <span className="mt-1 block text-sm font-black text-[#8b7a95]">/100</span>
               </motion.div>
             </div>
           </div>
         </motion.div>
 
-        {/* Score Label */}
-        <motion.p
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7, duration: 0.5 }}
-          className="text-4xl font-bold mb-4"
+        <motion.div
+          animate={{ opacity: [0.4, 0.8, 0.4] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          className="text-center text-xs font-bold uppercase tracking-[0.22em] text-[#8b7a95]"
         >
-          {getScoreLabel(score)}
-        </motion.p>
-
-        {/* Context Message */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9, duration: 0.5 }}
-          className="text-base opacity-95 font-light"
-        >
-          {score >= 80
-            ? "You've cracked the ATS code. Recruiters will see you! 🚀"
-            : score >= 60
-            ? "Getting closer. A few tweaks and you'll breeze through. 💪"
-            : "Major overhaul time, but you've got this! 🔥"}
-        </motion.p>
+          Scan complete
+        </motion.div>
       </div>
     </motion.div>
   );

@@ -4,6 +4,9 @@ import ResumeInput from './components/ResumeInput';
 import RoleSelector from './components/RoleSelector';
 import ScoreCard from './components/ScoreCard';
 import RecruiterReaction from './components/RecruiterReaction';
+import RecruiterSimulation from './components/RecruiterSimulation';
+import EyeTrackingAnalysis from './components/EyeTrackingAnalysis';
+import MultiplayerRoastMode from './components/MultiplayerRoastMode';
 import FeedbackList from './components/FeedbackList';
 import AnimatedBackground from './components/AnimatedBackground';
 import { scoreResume } from './utils/scoreResume';
@@ -17,11 +20,11 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
 
   const loadingMessages = [
-    '🔍 Scanning keywords…',
-    '👀 Summoning ATS demons…',
-    '🤖 Recruiter judging in progress…',
-    '💭 Analyzing bullet points…',
-    '⚡ Running through the matrix…'
+    'The ATS is warming up.',
+    'Recruiter attention span detected.',
+    'Checking keyword alignment.',
+    'Judging the evidence density.',
+    'Calculating internship survival odds.'
   ];
 
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
@@ -50,118 +53,71 @@ export default function App() {
   };
 
   return (
-    <div className="relative min-h-screen bg-slate-950 text-white overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-[#fff6ee] text-[#32283f]">
       <AnimatedBackground />
 
       <div className="relative z-10">
-        {/* Hero Section - Completely Redesigned */}
         {score === null && (
           <motion.header
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8 }}
-            className="min-h-screen pt-20 pb-20 flex flex-col items-center justify-center relative overflow-hidden"
+            className="min-h-screen px-4 py-8 sm:px-6 lg:px-8"
           >
-            {/* Decorative rotating borders */}
-            <motion.div
-              className="absolute top-20 left-10 w-40 h-40 rounded-full border border-blue-500/20"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
-            />
-            <motion.div
-              className="absolute bottom-32 right-20 w-56 h-56 rounded-full border border-purple-500/20"
-              animate={{ rotate: -360 }}
-              transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-            />
-
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
-              {/* Main title */}
+            <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl flex-col justify-center gap-8">
               <motion.div
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.6 }}
-              >
-                <h1 className="text-7xl sm:text-8xl font-black mb-6 leading-tight" style={{
-                  background: 'linear-gradient(135deg, #60a5fa, #a78bfa, #f472b6)',
-                  backgroundSize: '200% 200%',
-                  animation: 'gradient-shift 6s ease infinite',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text'
-                }}>
-                  Can You Pass<br />the ATS?
-                </h1>
-              </motion.div>
-
-              {/* Subtitle */}
-              <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.6 }}
-                className="text-2xl font-light text-slate-300 mb-4 leading-relaxed"
+                transition={{ delay: 0.1, duration: 0.6 }}
+                className="mx-auto max-w-4xl text-center"
               >
-                The emotionally dramatic ATS simulator
-              </motion.p>
+                <div className="mb-5 inline-flex rounded-full bg-white/55 px-4 py-2 text-xs font-bold uppercase tracking-[0.22em] text-[#7d5c98] shadow-sm ring-1 ring-[#d9b8e8]/50 backdrop-blur">
+                  Internship anxiety simulator
+                </div>
+                <h1 className="text-5xl font-black leading-[0.92] tracking-[-0.04em] text-[#33243f] sm:text-7xl lg:text-8xl">
+                  Will your resume survive?
+                </h1>
+                <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-[#6f6078] sm:text-xl">
+                  Paste your resume, pick an internship lane, and let the tiny gatekeeping machine decide if your bullet points have emotional range.
+                </p>
+              </motion.div>
 
-              {/* Disclaimer */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.5, duration: 0.6 }}
-                className="text-sm text-slate-400 italic mb-16"
-              >
-                Where your resume's fate is decided by increasingly absurd rules
-              </motion.p>
-
-              {/* Input Section */}
               <motion.div
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.6 }}
-                className="glass rounded-3xl p-8 sm:p-12 max-w-2xl mx-auto border border-slate-700/50"
+                transition={{ delay: 0.4, duration: 0.6 }}
+                className="mx-auto w-full max-w-5xl rounded-[2rem] bg-white/62 p-5 shadow-[0_30px_90px_rgba(126,76,142,0.18)] ring-1 ring-white/70 backdrop-blur-xl sm:p-8 lg:p-10"
               >
-                <ResumeInput value={resume} onChange={setResume} />
-                <RoleSelector selectedRole={selectedRole} onChange={setSelectedRole} />
+                <div className="space-y-6">
+                  <ResumeInput value={resume} onChange={setResume} />
+                  <RoleSelector selectedRole={selectedRole} onChange={setSelectedRole} />
 
-                {/* Scan Button */}
-                <motion.button
-                  onClick={handleScan}
-                  disabled={!resume.trim() || isLoading}
-                  whileHover={{ scale: !isLoading && resume.trim() ? 1.05 : 1 }}
-                  whileTap={{ scale: !isLoading && resume.trim() ? 0.98 : 1 }}
-                  className={`w-full py-5 px-8 rounded-2xl font-bold text-lg transition-all transform relative group overflow-hidden ${
-                    isLoading || !resume.trim()
-                      ? 'bg-slate-700/30 text-slate-400 cursor-not-allowed'
-                      : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:shadow-2xl hover:shadow-blue-500/50 hover:from-blue-500 hover:to-purple-500'
-                  }`}
-                >
-                  {/* Glow effect on hover */}
-                  {!isLoading && resume.trim() && (
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-400/50 to-purple-400/50 blur-xl group-hover:opacity-100 opacity-0 transition-opacity -z-10" />
-                  )}
-                  
-                  <motion.div
-                    className="flex items-center justify-center gap-3"
-                    key={isLoading ? loadingMessages[loadingMessageIndex] : 'scan'}
-                  >
-                    <motion.span
-                      initial={{ rotate: 0 }}
-                      animate={{ rotate: isLoading ? 360 : 0 }}
-                      transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                      className="inline-block text-xl"
+                  <div className="flex justify-center pt-1">
+                    <motion.button
+                      onClick={handleScan}
+                      disabled={!resume.trim() || isLoading}
+                      whileHover={{ y: !isLoading && resume.trim() ? -2 : 0, scale: !isLoading && resume.trim() ? 1.01 : 1 }}
+                      whileTap={{ scale: !isLoading && resume.trim() ? 0.98 : 1 }}
+                      className={`group relative w-full max-w-md overflow-hidden rounded-3xl px-8 py-5 text-base font-black transition-all duration-300 sm:w-auto sm:min-w-72 ${
+                        isLoading || !resume.trim()
+                          ? 'cursor-not-allowed bg-[#d8cadf]/55 text-[#8b7a95]'
+                          : 'bg-[#4f2cff] text-white shadow-[0_18px_45px_rgba(79,44,255,0.28)] hover:bg-[#3f20df]'
+                      }`}
                     >
-                      {isLoading ? '⚙️' : '🚀'}
-                    </motion.span>
-                    <motion.span
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="font-semibold"
-                    >
-                      {isLoading ? loadingMessages[loadingMessageIndex] : 'Scan My Resume'}
-                    </motion.span>
-                  </motion.div>
-                </motion.button>
+                      {!isLoading && resume.trim() && (
+                        <span className="absolute inset-0 translate-y-full bg-white/15 transition-transform duration-300 group-hover:translate-y-0" />
+                      )}
+                      <motion.span
+                        initial={{ opacity: 1 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="relative z-10"
+                      >
+                        {isLoading ? loadingMessages[loadingMessageIndex] : 'Start ATS Scan'}
+                      </motion.span>
+                    </motion.button>
+                  </div>
+                </div>
               </motion.div>
             </div>
           </motion.header>
@@ -176,66 +132,80 @@ export default function App() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
-              className="min-h-screen py-12 sm:py-20"
+              className="min-h-screen px-4 py-10 sm:px-6 sm:py-16 lg:px-8"
             >
-              <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                {/* Score Section - CENTERPIECE */}
+              <div className="mx-auto max-w-5xl space-y-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="text-center"
+                >
+                  <p className="text-sm font-bold uppercase tracking-[0.22em] text-[#89679e]">Scan complete</p>
+                  <h2 className="mt-3 text-4xl font-black tracking-[-0.03em] text-[#33243f] sm:text-6xl">
+                    The verdict is emotionally complicated.
+                  </h2>
+                </motion.div>
+
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.1, duration: 0.7, type: 'spring' }}
-                  className="mb-12"
+                  className=""
                 >
                   <ScoreCard score={score} />
                 </motion.div>
 
-                {/* Recruiter Reaction */}
                 <motion.div
                   initial={{ x: -50, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.4, duration: 0.6 }}
-                  className="mb-12"
+                  transition={{ delay: 0.3, duration: 0.6 }}
+                  className=""
                 >
                   <RecruiterReaction score={score} />
                 </motion.div>
 
-                {/* Feedback Section */}
+                <RecruiterSimulation score={score} />
+
+                <EyeTrackingAnalysis feedback={feedback} />
+
                 <motion.div
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6, duration: 0.6 }}
-                  className="glass rounded-3xl p-8 sm:p-10 border border-slate-700/50 mb-12"
+                  className="mx-auto w-full max-w-4xl rounded-[2rem] bg-white/68 p-5 shadow-[0_20px_70px_rgba(126,76,142,0.14)] ring-1 ring-white/70 backdrop-blur-xl sm:p-8"
                 >
                   <FeedbackList feedback={feedback} />
                 </motion.div>
 
-                {/* Action Buttons */}
+                <MultiplayerRoastMode />
+
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.8, duration: 0.6 }}
-                  className="flex gap-4 flex-col sm:flex-row"
+                  className="flex flex-col gap-3 sm:flex-row sm:justify-center"
                 >
                   <motion.button
                     onClick={handleReset}
-                    whileHover={{ scale: 1.05, y: -4 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex-1 glass rounded-2xl py-4 px-6 font-bold transition-all border border-slate-600/50 hover:border-slate-500 hover:bg-slate-800/40 text-slate-100"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full rounded-2xl bg-white/65 px-6 py-4 text-sm font-black uppercase tracking-[0.14em] text-[#62436f] shadow-sm ring-1 ring-[#d9b8e8]/60 transition-all hover:bg-white/85 sm:w-auto sm:min-w-52"
                   >
-                    🔄 Try Again
+                    Analyze Again
                   </motion.button>
 
                   <motion.button
                     onClick={() => {
-                      const text = `Check out my ATS score: ${score}/100 on "Can You Pass the ATS?" 🎮`;
+                      const text = `I scored ${score}/100 on the ATS Resume Game. Interview probability: emotionally complicated.`;
                       navigator.clipboard.writeText(text);
-                      alert('✨ Copied to clipboard! Ready to share!');
+                      alert('Copied to clipboard! Share your score!');
                     }}
-                    whileHover={{ scale: 1.05, y: -4 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="flex-1 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-2xl py-4 px-6 font-bold transition-all hover:shadow-2xl hover:shadow-cyan-500/50 hover:from-cyan-500 hover:to-blue-500"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full rounded-2xl bg-[#4f2cff] px-6 py-4 text-sm font-black uppercase tracking-[0.14em] text-white shadow-[0_18px_45px_rgba(79,44,255,0.24)] transition-all hover:bg-[#3f20df] sm:w-auto sm:min-w-52"
                   >
-                    📤 Share Score
+                    Copy Share Text
                   </motion.button>
                 </motion.div>
               </div>
@@ -243,19 +213,15 @@ export default function App() {
           )}
         </AnimatePresence>
 
-        {/* Footer */}
         {score === null && (
           <motion.footer
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1, duration: 0.6 }}
-            className="fixed bottom-0 left-0 right-0 py-6 text-center border-t border-slate-800/50 bg-slate-950/50 backdrop-blur-sm"
+            className="pointer-events-none px-4 pb-6 text-center"
           >
-            <p className="text-slate-400 text-sm">
-              Made with ❤️ for students and job seekers
-            </p>
-            <p className="text-slate-500 text-xs mt-1">
-              No AI, purely rule-based scoring | Phase 2 ✨
+            <p className="text-xs font-medium text-[#8c7a91]">
+              This is a game. Your resume is probably fine. Probably.
             </p>
           </motion.footer>
         )}
