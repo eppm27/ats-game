@@ -1,120 +1,145 @@
-import keywordBanks from './keywordBanks';
+import keywordBanks from "./keywordBanks.js";
+import {
+  normalizeText,
+  countWords,
+  hasTerm,
+  hasPhone,
+  actionVerbs,
+  metricLines,
+  lengthPoints,
+} from "./scoringRules.js";
 
-export const scoreResume = (resumeText, selectedRole) => {
-  const text = resumeText.toLowerCase();
-  let score = 50; // Start with 50
-  const feedback = [];
-
-  if (!resumeText.trim()) {
-    return { score: 0, feedback: ['❌ Resume content is required for evaluation.'] };
-  }
-
-  // 1. Length check (optimal: 400-800 words)
-  const wordCount = text.split(/\s+/).length;
-  if (wordCount < 100) {
-    score -= 15;
-    feedback.push('⚠️ This resume is a haiku. Add more detail.');
-  } else if (wordCount > 1000) {
-    score -= 10;
-    feedback.push('⚠️ This resume has novel energy. Recruiters want a short story.');
-  } else if (wordCount >= 400 && wordCount <= 800) {
-    score += 10;
-    feedback.push('✅ Length is perfect. Goldilocks vibes.');
-  }
-
-  // 2. Format checks
-  const hasBulletPoints = /\n\s*[-•*]\s/.test(resumeText);
-  if (hasBulletPoints) {
-    score += 8;
-    feedback.push('✅ Bullet points found. ATS is happy.');
-  } else {
-    score -= 5;
-    feedback.push('⚠️ Add bullets. Wall of text looks like a paragraph enemy.');
-  }
-
-  const hasDates = /\b(20\d{2}|19\d{2})\b/.test(text);
-  if (hasDates) {
-    score += 5;
-    feedback.push('✅ Dates included. Recruiters can follow your career arc.');
-  } else {
-    score -= 3;
-    feedback.push('⚠️ Add dates. When did you do this stuff?');
-  }
-
-  const hasEmail = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/.test(text);
-  const hasPhone = /\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/.test(text);
-  if (hasEmail && hasPhone) {
-    score += 10;
-    feedback.push('✅ Recruiter can reach you. Both email and phone detected.');
-  } else if (hasEmail || hasPhone) {
-    score += 5;
-    feedback.push('⚠️ Missing either email or phone. Recruiters hate guessing.');
-  } else {
-    score -= 10;
-    feedback.push('❌ No contact info found. How will they call you?');
-  }
-
-  // 3. Role-specific keywords
-  const roleKeywords = keywordBanks[selectedRole] || [];
-  let matchedKeywords = 0;
-
-  roleKeywords.forEach((keyword) => {
-    // Escape special regex characters in the keyword
-    const escapedKeyword = keyword.toLowerCase().replace(/[+*?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`\\b${escapedKeyword}\\b`, 'g');
-    const matches = text.match(regex) || [];
-    matchedKeywords += matches.length;
-  });
-
-  const keywordScore = Math.min(25, matchedKeywords * 2);
-  score += keywordScore;
-
-  if (matchedKeywords >= 8) {
-    feedback.push(`✅ Keyword alignment is fire. ${matchedKeywords} role terms matched.`);
-  } else if (matchedKeywords >= 4) {
-    feedback.push(`⚠️ Only ${matchedKeywords} keywords matched. Recruiters will get the vibe check wrong.`);
-  } else {
-    feedback.push(`❌ ${matchedKeywords} keywords? The ATS has no idea what you do.`);
-  }
-
-  // 4. GPA mention (optional bonus)
-  if (/gpa|3\.\d|4\.0/i.test(text)) {
-    score += 3;
-    feedback.push('✅ GPA included. Flexing the academics.');
-  }
-
-  // 5. Action verbs check
-  const actionVerbs = [
-    'developed', 'created', 'built', 'led', 'managed', 'designed',
-    'implemented', 'optimized', 'analyzed', 'collaborated', 'improved'
+export function scoreResume(resumeText, selectedRole) {
+  const text = normalizeText(resumeText);
+  const words = countWords(text);
+  const email = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/.test(text);
+  const phone = hasPhone(text);
+  const matched = (keywordBanks[selectedRole] ?? [])
+    .filter((aliases) => aliases.some((term) => hasTerm(text, term)))
+    .map((aliases) => aliases[0]);
+  const verbs = actionVerbs.filter((verb) => hasTerm(text, verb)).length;
+  const bullets = new Set(
+    text
+      .split("\n")
+      .filter((line) => /^\s*(?:[-•*▪◦]|\d+[.)])\s+\S/.test(line)),
+  ).size;
+  const metrics = metricLines(text);
+  const dates =
+    /\b(?:19|20)\d{2}\s*(?:-\s*(?:(?:[a-z]+\s+)?(?:19|20)\d{2}|present|current)|to\s+(?:(?:19|20)\d{2}|present))\b|\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?\s+(?:19|20)\d{2}\b|\b(?:0?[1-9]|1[0-2])\/(?:19|20)\d{2}\b/.test(
+      text,
+    );
+  const sections = [
+    /^(?:education|qualifications)\s*:?$/m,
+    /^(?:(?:work |professional |relevant )?experience|projects|employment)\s*:?$/m,
+    /^(?:(?:technical |core )?skills|technologies)\s*:?$/m,
+  ].filter((pattern) => pattern.test(text)).length;
+  const breakdown = [
+    {
+      id: "keywords",
+      label: "Role keywords",
+      points: Math.min(25, matched.length * 3),
+      max: 25,
+      detail: `${matched.length} distinct terms; 3 points each, capped at 25. Aliases count once.`,
+      good: matched.length >= 9,
+      fix: "Name relevant tools you have actually used.",
+      success: `${matched.length} distinct role terms found.`,
+    },
+    {
+      id: "impact",
+      label: "Measurable results",
+      points: Math.min(20, metrics * 10),
+      max: 20,
+      detail: `${metrics} distinct lines pair an action verb with a metric; 10 points each, capped at 20.`,
+      good: metrics >= 2,
+      fix: "Add results: “Reduced load time by 40%.”",
+      success: "Actions backed by measurable results.",
+    },
+    {
+      id: "contact",
+      label: "Contact details",
+      points: (email ? 5 : 0) + (phone ? 5 : 0),
+      max: 10,
+      detail: "5 points each for an email address and a phone number.",
+      good: email && phone,
+      fix:
+        !email && !phone
+          ? "Add an email and phone number."
+          : !email
+            ? "Add an email address."
+            : "Add a phone number, if appropriate.",
+      success: "Email + phone found.",
+    },
+    {
+      id: "format",
+      label: "Bullets",
+      points: Math.min(10, bullets * 2),
+      max: 10,
+      detail: `${bullets} distinct bullet lines; 2 points each, capped at 10. Visual layout is not assessed.`,
+      good: bullets >= 5,
+      fix: "Use short bullets for projects and experience.",
+      success: "Experience is easy to skim.",
+    },
+    {
+      id: "verbs",
+      label: "Action verbs",
+      points: Math.min(10, verbs * 2),
+      max: 10,
+      detail: `${verbs} distinct action verbs; 2 points each, capped at 10.`,
+      good: verbs >= 5,
+      fix: "Lead with verbs like “built” or “led”.",
+      success: "Clear action verbs found.",
+    },
+    {
+      id: "structure",
+      label: "Sections + dates",
+      points: sections * 3 + (dates ? 6 : 0),
+      max: 15,
+      detail:
+        "3 points each for education, experience/projects and skills headings; 6 for a date range or month + year.",
+      good: sections === 3 && dates,
+      fix:
+        sections < 3
+          ? "Use Education, Experience / Projects, Skills headings."
+          : "Add month + year or date ranges.",
+      success: "Clear sections and dates.",
+    },
+    {
+      id: "length",
+      label: "Resume length",
+      points: lengthPoints(words),
+      max: 10,
+      detail: `${words} words. 250–800: 10 points; 150–249: 7; 801–1,000: 5; 80–149: 3; otherwise: 0.`,
+      good: words >= 250 && words <= 800,
+      fix:
+        words > 800
+          ? "Trim less relevant details; aim under 800 words."
+          : "Add useful project and experience details.",
+      success: "Length is in the sweet spot.",
+    },
   ];
-  let actionVerbCount = 0;
-  actionVerbs.forEach((verb) => {
-    const regex = new RegExp(`\\b${verb}\\b`, 'gi');
-    actionVerbCount += (text.match(regex) || []).length;
-  });
-
-  if (actionVerbCount >= 5) {
-    score += 8;
-    feedback.push('✅ Action verbs everywhere. This resume moves.');
-  } else if (actionVerbCount > 0) {
-    score += 3;
-    feedback.push('⚠️ Need more power. Replace "worked on" with "led" or "built".');
-  } else {
-    feedback.push('❌ No action verbs detected. Recruiters will assume you observed things happen.');
-  }
-
-  // 6. Quantifiable results
-  const hasNumbers = /\b\d+(?:%|x|times?|results?|users?|seconds?|days?|months?|years?)\b/i.test(text);
-  if (hasNumbers) {
-    score += 8;
-    feedback.push('✅ Metrics found. Proof that you actually did things.');
-  } else {
-    feedback.push('⚠️ Add numbers. "Increased engagement" > "increased engagement by 40%".');
-  }
-
-  // Clamp score between 0-100
-  score = Math.max(0, Math.min(100, score));
-
-  return { score: Math.round(score), feedback };
-};
+  // Sort fixes by missing points, retaining a stable priority for ties.
+  const fixes = breakdown
+    .filter((item) => !item.good)
+    .sort((a, b) => b.max - b.points - (a.max - a.points));
+  const good = breakdown.filter((item) => item.good);
+  const feedback = [...fixes, ...good]
+    .slice(0, 7)
+    .map((item) => ({
+      id: item.id,
+      type: item.good ? "good" : "fix",
+      text: item.good ? item.success : item.fix,
+    }));
+  return {
+    score: Math.max(
+      0,
+      Math.min(
+        100,
+        breakdown.reduce((total, item) => total + item.points, 0),
+      ),
+    ),
+    feedback,
+    breakdown,
+    matchedKeywords: matched,
+    wordCount: words,
+  };
+}
